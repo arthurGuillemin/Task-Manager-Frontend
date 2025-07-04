@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import useTasks from "../hooks/useTasks";
 import TaskCard from "../components/TaskCard";
 import Loader from "../components/Loader";
@@ -6,11 +7,10 @@ import Loader from "../components/Loader";
 const prioritéOrder = { Haute: 1, Moyenne: 2, Basse: 3 };
 
 const Home = () => {
-  const { tasks, loading } = useTasks();
+  const { tasks, loading, editTask } = useTasks();
+  const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
-
-
   const [sortBy, setSortBy] = useState("date_asc");
   const [filters, setFilters] = useState({
     client: "all",
@@ -27,7 +27,7 @@ const Home = () => {
   const filteredAndSortedTasks = useMemo(() => {
     return [...tasks]
       .filter((task) => {
-          if (searchText.trim() !== "") {
+        if (searchText.trim() !== "") {
           const text = searchText.toLowerCase();
           const found =
             (task.sujet && task.sujet.toLowerCase().includes(text)) ||
@@ -37,16 +37,20 @@ const Home = () => {
             (task.remarques && task.remarques.toLowerCase().includes(text));
           if (!found) return false;
         }
+
         if (filters.client !== "all" && task.client_offre !== filters.client) return false;
         if (filters.priorite !== "all" && task.priorite !== filters.priorite) return false;
         if (filters.responsable !== "all" && task.responsable !== filters.responsable) return false;
         if (filters.suivi !== "all" && task.suivi !== filters.suivi) return false;
+
         if (filters.checklist === "complete") {
           return task.checklist.length > 0 && task.checklist.every((item) => item.fait);
         }
+
         if (filters.checklist === "incomplete") {
           return task.checklist.some((item) => !item.fait);
         }
+
         return true;
       })
       .sort((a, b) => {
@@ -60,18 +64,24 @@ const Home = () => {
             const echA = a.echeance ? new Date(a.echeance) : new Date(8640000000000000);
             const echB = b.echeance ? new Date(b.echeance) : new Date(8640000000000000);
             return echA - echB;
+
           case "date_desc":
             return new Date(b.date_initiale) - new Date(a.date_initiale);
+
           case "priorite":
             return prioritéOrder[a.priorite] - prioritéOrder[b.priorite];
+
           case "client":
             return a.client_offre.localeCompare(b.client_offre);
+
           case "responsable":
             return a.responsable.localeCompare(b.responsable);
+
           case "checklist":
             const doneA = a.checklist.filter((item) => item.fait).length;
             const doneB = b.checklist.filter((item) => item.fait).length;
             return doneB - doneA;
+
           default:
             return 0;
         }
@@ -80,19 +90,17 @@ const Home = () => {
 
   if (loading) return <Loader />;
 
-const handleReset = () => {
-  setSortBy("date_asc");
-  setFilters({
-    client: "all",
-    priorite: "all",
-    responsable: "all",
-    suivi: "all",
-    checklist: "all",
-  });
-  setSearchText("");
-};
-
-
+  const handleReset = () => {
+    setSortBy("date_asc");
+    setFilters({
+      client: "all",
+      priorite: "all",
+      responsable: "all",
+      suivi: "all",
+      checklist: "all",
+    });
+    setSearchText("");
+  };
 
   const clients = [...new Set(tasks.map((t) => t.client_offre))];
   const responsables = [...new Set(tasks.map((t) => t.responsable))];
@@ -100,6 +108,17 @@ const handleReset = () => {
 
   return (
     <div className="p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">Liste des tâches</h1>
+        <button
+          onClick={() => navigate("/new")}
+          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          ➕ Nouvelle tâche
+        </button>
+      </div>
+
+      {/* Barre de filtres */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium">Trier par</label>
@@ -193,31 +212,35 @@ const handleReset = () => {
           </select>
         </div>
       </div>
+
       <button
-  onClick={handleReset}
-  className="mt-2 px-3 py-1 bg-gray-100 text-sm text-gray-700 rounded hover:bg-gray-200"
->
-  🔄 Réinitialiser les filtres
-</button>
-<div className="mb-4">
+        onClick={handleReset}
+        className="mt-2 mb-6 px-3 py-1 bg-gray-100 text-sm text-gray-700 rounded hover:bg-gray-200"
+      >
+        🔄 Réinitialiser les filtres
+      </button>
 
-  <label htmlFor="search" className="block text-sm font-medium mb-1">Recherche rapide</label>
-  <input
-    id="search"
-    type="text"
-    className="w-full border rounded px-2 py-1"
-    placeholder="Recherche texte..."
-    value={searchText}
-    onChange={(e) => setSearchText(e.target.value)}
-  />
-</div>
+      {/* Searchbar */}
+      <div className="mb-4">
+        <label htmlFor="search" className="block text-sm font-medium mb-1">
+          Recherche rapide
+        </label>
+        <input
+          id="search"
+          type="text"
+          className="w-full border rounded px-2 py-1"
+          placeholder="Recherche texte..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+        />
+      </div>
 
-
-
-      <div className="flex flex-wrap  py-16">
+      {/* Affichage des cartes */}
+  <div className="flex flex-wrap gap-x-3 gap-y-6 py-4 w-full">
         {filteredAndSortedTasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} onSave={editTask} />
         ))}
+
         {filteredAndSortedTasks.length === 0 && (
           <p className="text-center text-gray-500 italic">Aucune tâche trouvée.</p>
         )}

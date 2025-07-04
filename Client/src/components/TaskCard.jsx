@@ -1,6 +1,6 @@
 const TaskCard = ({ task }) => {
   return (
-    <div className="border rounded-xl p-6 shadow-md bg-white w-80 margin-bottom-10 mx-auto min-h-[350px] flex flex-col justify-between space-y-4">
+      <div className="border rounded-xl p-6 shadow-md bg-white w-100  mx-auto min-h-[350px] flex flex-col justify-between space-y-4">
       {/* Sujet */}
       <h2 className="text-2xl font-bold mb-2 text-gray-800">{task.sujet}</h2>
 

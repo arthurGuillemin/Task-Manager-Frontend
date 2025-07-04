@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getTasks } from "../services/taskService";
+import { getTasks  , createTask} from "../services/taskService";
 
-const useTasks = () => {
+export default function useTasks() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +12,15 @@ const useTasks = () => {
     });
   }, []);
 
-  return { tasks, loading };
-};
+  const addTask = async (task) => {
+    const newTask = await createTask(task);
+    setTasks(prev => [...prev, newTask]);
+  };
 
-export default useTasks;
+  const editTask = async (id, updates) => {
+    const updated = await updateTask(id, updates);
+    setTasks(prev => prev.map(t => (t.id === id ? updated : t)));
+  };
+
+  return { tasks, loading, addTask, editTask };
+}
