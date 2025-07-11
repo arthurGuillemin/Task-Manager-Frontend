@@ -19,8 +19,30 @@ const TaskCard = ({ task, onSave }) => {
     setEditMode(false);
   };
 
+  const getBackgroundColor = () => {
+    const now = new Date();
+    const deadline = task.echeance ? new Date(task.echeance) : null;
+    const daysLeft = deadline ? (deadline - now) / (1000 * 60 * 60 * 24) : null;
+
+    if (deadline && daysLeft <= 2) {
+      return "bg-red-200"; // Urgent : échéance proche ou dépassée
+    }
+
+    if (task.priorite?.toLowerCase() === "haute") {
+      return "bg-orange-100";
+    }
+
+    if (task.priorite?.toLowerCase() === "moyenne") {
+      return "bg-yellow-50";
+    }
+
+    return "bg-slate-200";
+  };
+
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 w-full min-h-[350px] flex flex-col justify-between space-y-4">
+    <div
+      className={`${getBackgroundColor()} rounded-xl shadow-lg p-6 w-full min-h-[350px] flex flex-col justify-between space-y-4 border border-gray-300`}
+    >
       {/* Sujet */}
       <div>
         {editMode ? (

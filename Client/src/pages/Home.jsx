@@ -11,7 +11,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
-  const [sortBy, setSortBy] = useState("date_asc");
+  const [sortBy, setSortBy] = useState("priorite");
   const [filters, setFilters] = useState({
     client: "all",
     priorite: "all",
@@ -55,32 +55,21 @@ const Home = () => {
       .sort((a, b) => {
         switch (sortBy) {
           case "date_asc":
-            const dateA = a.date_initiale ? new Date(a.date_initiale) : new Date(8640000000000000);
-            const dateB = b.date_initiale ? new Date(b.date_initiale) : new Date(8640000000000000);
-            return dateA - dateB;
-
+            return new Date(a.date_initiale || Infinity) - new Date(b.date_initiale || Infinity);
           case "echeance":
-            const echA = a.echeance ? new Date(a.echeance) : new Date(8640000000000000);
-            const echB = b.echeance ? new Date(b.echeance) : new Date(8640000000000000);
-            return echA - echB;
-
+            return new Date(a.echeance || Infinity) - new Date(b.echeance || Infinity);
           case "date_desc":
             return new Date(b.date_initiale) - new Date(a.date_initiale);
-
           case "priorite":
             return prioritéOrder[a.priorite] - prioritéOrder[b.priorite];
-
           case "client":
             return a.client_offre.localeCompare(b.client_offre);
-
           case "responsable":
             return a.responsable.localeCompare(b.responsable);
-
           case "checklist":
             const doneA = a.checklist.filter((item) => item.fait).length;
             const doneB = b.checklist.filter((item) => item.fait).length;
             return doneB - doneA;
-
           default:
             return 0;
         }
@@ -106,23 +95,23 @@ const Home = () => {
   const suivis = [...new Set(tasks.map((t) => t.suivi))];
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Liste des tâches</h1>
+    <div className="p-6 bg-gray-600 min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">📋 Liste des tâches</h1>
         <button
           onClick={() => navigate("/new")}
-          className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
         >
           ➕ Nouvelle tâche
         </button>
       </div>
 
-      {/* Barre de filtres */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      {/* Filtres */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 bg-slate-200 p-4 rounded-lg shadow mb-6">
         <div>
-          <label className="block text-sm font-medium">Trier par</label>
+          <label className="block text-sm font-medium text-gray-700">Trier par</label>
           <select
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >
@@ -137,25 +126,23 @@ const Home = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Client</label>
+          <label className="block text-sm font-medium text-gray-700">Client</label>
           <select
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1"
             value={filters.client}
             onChange={(e) => handleFilterChange("client", e.target.value)}
           >
             <option value="all">Tous</option>
             {clients.map((client) => (
-              <option key={client} value={client}>
-                {client}
-              </option>
+              <option key={client} value={client}>{client}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Priorité</label>
+          <label className="block text-sm font-medium text-gray-700">Priorité</label>
           <select
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1"
             value={filters.priorite}
             onChange={(e) => handleFilterChange("priorite", e.target.value)}
           >
@@ -167,41 +154,37 @@ const Home = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Responsable</label>
+          <label className="block text-sm font-medium text-gray-700">Responsable</label>
           <select
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1"
             value={filters.responsable}
             onChange={(e) => handleFilterChange("responsable", e.target.value)}
           >
             <option value="all">Tous</option>
             {responsables.map((resp) => (
-              <option key={resp} value={resp}>
-                {resp}
-              </option>
+              <option key={resp} value={resp}>{resp}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Suivi</label>
+          <label className="block text-sm font-medium text-gray-700">Suivi</label>
           <select
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1"
             value={filters.suivi}
             onChange={(e) => handleFilterChange("suivi", e.target.value)}
           >
             <option value="all">Tous</option>
             {suivis.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+              <option key={s} value={s}>{s}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Checklist</label>
+          <label className="block text-sm font-medium text-gray-700">Checklist</label>
           <select
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded-lg px-3 py-2 mt-1"
             value={filters.checklist}
             onChange={(e) => handleFilterChange("checklist", e.target.value)}
           >
@@ -212,36 +195,38 @@ const Home = () => {
         </div>
       </div>
 
-      <button
-        onClick={handleReset}
-        className="mt-2 mb-6 px-3 py-1 bg-gray-100 text-sm text-gray-700 rounded hover:bg-gray-200"
-      >
-        🔄 Réinitialiser les filtres
-      </button>
-
-      {/* Searchbar */}
-      <div className="mb-4">
-        <label htmlFor="search" className="block text-sm font-medium mb-1">
-          Recherche rapide
-        </label>
-        <input
-          id="search"
-          type="text"
-          className="w-full border rounded px-2 py-1"
-          placeholder="Recherche texte..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={handleReset}
+          className="text-sm px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+        >
+          🔄 Réinitialiser les filtres
+        </button>
+        <div className="w-full ml-4">
+          <label htmlFor="search" className="block text-sm font-medium text-gray-200 mb-1">
+            Recherche rapide
+          </label>
+          <input
+            id="search"
+            type="text"
+            className="w-full border rounded-lg px-3 py-2"
+            placeholder="Sujet, client, responsable, remarques..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Affichage des cartes */}
-  <div className="flex flex-wrap gap-x-3 gap-y-6 py-4 w-full">
-        {filteredAndSortedTasks.map((task) => (
-          <TaskCard key={task.id} task={task} onSave={editTask} />
-        ))}
-
-        {filteredAndSortedTasks.length === 0 && (
-          <p className="text-center text-gray-500 italic">Aucune tâche trouvée.</p>
+      {/* Cartes */}
+      <div className="flex flex-wrap gap-x-4 gap-y-6 py-4">
+        {filteredAndSortedTasks.length > 0 ? (
+          filteredAndSortedTasks.map((task) => (
+            <TaskCard key={task.id} task={task} onSave={editTask} />
+          ))
+        ) : (
+          <p className="w-full text-center text-gray-500 italic mt-4">
+            Aucune tâche trouvée.
+          </p>
         )}
       </div>
     </div>
