@@ -47,13 +47,6 @@ const TaskCard = ({ task, onSave }) => {
             <input
               type="text"
               className="w-full"
-              value={editedTask.pilote}
-              onChange={(e) => handleChange("pilote", e.target.value)}
-              placeholder="Pilote"
-            />
-            <input
-              type="text"
-              className="w-full"
               value={editedTask.client_offre}
               onChange={(e) => handleChange("client_offre", e.target.value)}
               placeholder="Client"
@@ -62,7 +55,6 @@ const TaskCard = ({ task, onSave }) => {
         ) : (
           <>
             <p><strong>Responsable :</strong> {task.responsable || "-"}</p>
-            <p><strong>Pilote :</strong> {task.pilote || "-"}</p>
             <p><strong>Client :</strong> {task.client_offre || "-"}</p>
           </>
         )}

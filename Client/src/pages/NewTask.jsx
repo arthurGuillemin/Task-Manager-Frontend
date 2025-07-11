@@ -8,7 +8,6 @@ export default function NewTask() {
 
   const [form, setForm] = useState({
     date_initiale: '',
-    pilote: '',
     client_offre: '',
     sujet: '',
     responsable: '',
@@ -50,19 +49,28 @@ export default function NewTask() {
     }));
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    try {
-      await addTask({
-        ...form,
-        checklist: form.checklist,
-      });
-      navigate('/');
-    } catch (err) {
-      console.error('Erreur création tâche :', err.response?.data || err.message);
-      alert('Impossible de créer la tâche.');
+const handleSubmit = async e => {
+  e.preventDefault();
+
+  const formToSend = { ...form };
+  ['date_initiale', 'echeance', 'relance'].forEach(field => {
+    if (!formToSend[field]) {
+      delete formToSend[field]; // Supprimer du payload
     }
-  };
+  });
+
+  try {
+    await addTask({
+      ...formToSend,
+      checklist: form.checklist,
+    });
+    navigate('/');
+  } catch (err) {
+    console.error('Erreur création tâche :', err.response?.data || err.message);
+    alert('Impossible de créer la tâche.');
+  }
+};
+
 
   return (
     <>
@@ -83,7 +91,7 @@ export default function NewTask() {
       ))}
 
       {/* Text inputs */}
-      {['pilote','client_offre','sujet','responsable','demandes_precises','remarques'].map(name => (
+      {['client_offre','sujet','responsable','demandes_precises','remarques'].map(name => (
         <div key={name} className="mb-4">
           <label className="block text-sm font-medium capitalize">{name.replace('_', ' ')}</label>
           <input

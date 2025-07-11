@@ -33,7 +33,6 @@ const Home = () => {
             (task.sujet && task.sujet.toLowerCase().includes(text)) ||
             (task.client_offre && task.client_offre.toLowerCase().includes(text)) ||
             (task.responsable && task.responsable.toLowerCase().includes(text)) ||
-            (task.pilote && task.pilote.toLowerCase().includes(text)) ||
             (task.remarques && task.remarques.toLowerCase().includes(text));
           if (!found) return false;
         }
