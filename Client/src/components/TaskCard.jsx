@@ -9,9 +9,9 @@ const TaskCard = ({ task, onSave }) => {
   };
 
   const handleChecklistToggle = (index) => {
-    const newChecklist = [...editedTask.checklist];
-    newChecklist[index].fait = !newChecklist[index].fait;
-    setEditedTask((prev) => ({ ...prev, checklist: newChecklist }));
+    const updatedChecklist = [...editedTask.checklist];
+    updatedChecklist[index].fait = !updatedChecklist[index].fait;
+    setEditedTask((prev) => ({ ...prev, checklist: updatedChecklist }));
   };
 
   const handleSave = () => {
@@ -20,18 +20,19 @@ const TaskCard = ({ task, onSave }) => {
   };
 
   return (
-    <div className="border rounded-xl p-6 shadow-md bg-white w-100 mx-auto min-h-[350px] flex flex-col justify-between space-y-4">
-
+    <div className="bg-white rounded-xl shadow-lg p-6 w-full min-h-[350px] flex flex-col justify-between space-y-4">
       {/* Sujet */}
-      {editMode ? (
-        <input
-          className="text-2xl font-bold mb-2 text-gray-800"
-          value={editedTask.sujet}
-          onChange={(e) => handleChange("sujet", e.target.value)}
-        />
-      ) : (
-        <h2 className="text-2xl font-bold mb-2 text-gray-800">{task.sujet}</h2>
-      )}
+      <div>
+        {editMode ? (
+          <input
+            className="text-2xl font-bold w-full text-gray-800"
+            value={editedTask.sujet}
+            onChange={(e) => handleChange("sujet", e.target.value)}
+          />
+        ) : (
+          <h2 className="text-2xl font-bold text-gray-800">{task.sujet}</h2>
+        )}
+      </div>
 
       {/* Infos principales */}
       <div className="text-gray-700 space-y-1">
@@ -39,14 +40,14 @@ const TaskCard = ({ task, onSave }) => {
           <>
             <input
               type="text"
-              className="w-full"
+              className="w-full border rounded px-2 py-1"
               value={editedTask.responsable}
               onChange={(e) => handleChange("responsable", e.target.value)}
               placeholder="Responsable"
             />
             <input
               type="text"
-              className="w-full"
+              className="w-full border rounded px-2 py-1"
               value={editedTask.client_offre}
               onChange={(e) => handleChange("client_offre", e.target.value)}
               placeholder="Client"
@@ -61,30 +62,30 @@ const TaskCard = ({ task, onSave }) => {
       </div>
 
       {/* Description */}
-      {editMode ? (
-        <textarea
-          className="text-gray-600 italic w-full"
-          value={editedTask.demandes_precises}
-          onChange={(e) => handleChange("demandes_precises", e.target.value)}
-          placeholder="Description / demandes précises"
-        />
-      ) : (
-        <p className="text-gray-600 italic">{task.demandes_precises || "-"}</p>
-      )}
+      <div>
+        {editMode ? (
+          <textarea
+            className="w-full border rounded px-2 py-1 text-sm text-gray-700"
+            value={editedTask.demandes_precises}
+            onChange={(e) => handleChange("demandes_precises", e.target.value)}
+            placeholder="Description / demandes précises"
+          />
+        ) : (
+          <p className="text-sm italic text-gray-600">
+            {task.demandes_precises || "-"}
+          </p>
+        )}
+      </div>
 
       {/* Checklist */}
-      {task.checklist && task.checklist.length > 0 && (
+      {task.checklist?.length > 0 && (
         <div>
-          <strong>Checklist :</strong>
-          <ul className="list-disc list-inside text-gray-600 mt-1 max-h-24 overflow-y-auto">
+          <strong className="text-gray-800">Checklist :</strong>
+          <ul className="list-disc list-inside mt-1 max-h-32 overflow-y-auto text-sm text-gray-700 space-y-1">
             {task.checklist.map((item, idx) => (
               <li
                 key={idx}
-                className={
-                  editedTask.checklist[idx].fait
-                    ? "line-through text-green-600"
-                    : ""
-                }
+                className={editedTask.checklist[idx].fait ? "line-through text-green-600" : ""}
               >
                 {editMode ? (
                   <label className="flex items-center gap-2">
@@ -106,74 +107,77 @@ const TaskCard = ({ task, onSave }) => {
         </div>
       )}
 
-      {/* Footer avec échéance, priorité, remarques */}
-      <div className="flex justify-between items-center text-sm text-gray-500">
-        {editMode ? (
-          <>
-            <span>
-              Échéance :
-              <input
-                type="date"
-                className="ml-2"
-                value={editedTask.echeance || ""}
-                onChange={(e) => handleChange("echeance", e.target.value)}
-              />
-            </span>
-            <span>
-              Priorité :
-              <select
-                  className="ml-2 border border-gray-300 rounded px-2 py-1"
+      {/* Footer */}
+      <div className="flex flex-col gap-2 text-sm text-gray-600">
+        <div className="flex justify-between items-center">
+          {editMode ? (
+            <>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold">Échéance :</label>
+                <input
+                  type="date"
+                  value={editedTask.echeance || ""}
+                  onChange={(e) => handleChange("echeance", e.target.value)}
+                  className="border rounded px-2 py-1"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="font-semibold">Priorité :</label>
+                <select
                   value={editedTask.priorite}
                   onChange={(e) => handleChange("priorite", e.target.value)}
+                  className="border rounded px-2 py-1"
                 >
                   <option value="">--</option>
                   <option value="Haute">Haute</option>
                   <option value="Moyenne">Moyenne</option>
                   <option value="Basse">Basse</option>
                 </select>
+              </div>
+            </>
+          ) : (
+            <>
+              <span>
+                Échéance : <strong>{task.echeance || "-"}</strong>
+              </span>
+              <span>
+                Priorité : <strong>{task.priorite || "-"}</strong>
+              </span>
+            </>
+          )}
+        </div>
 
-            </span>
-          </>
+        {/* Remarques */}
+        {editMode ? (
+          <textarea
+            className="w-full border rounded px-2 py-1 text-sm text-yellow-700"
+            value={editedTask.remarques}
+            onChange={(e) => handleChange("remarques", e.target.value)}
+            placeholder="Remarques"
+          />
         ) : (
-          <>
-            <span>
-              Échéance : <strong>{task.echeance || "-"}</strong>
-            </span>
-            <span>
-              Priorité : <strong>{task.priorite || "-"}</strong>
-            </span>
-          </>
+          task.remarques && (
+            <p className="text-yellow-700 italic max-h-16 overflow-y-auto">
+              {task.remarques}
+            </p>
+          )
         )}
       </div>
-
-      {editMode ? (
-        <textarea
-          className="mt-2 text-yellow-700 italic w-full"
-          value={editedTask.remarques}
-          onChange={(e) => handleChange("remarques", e.target.value)}
-          placeholder="Remarques"
-        />
-      ) : (
-        task.remarques && (
-          <p className="mt-2 text-yellow-700 italic max-h-16 overflow-y-auto">
-            {task.remarques}
-          </p>
-        )
-      )}
 
       {/* Boutons */}
       <div className="flex justify-end gap-2 pt-2">
         {editMode ? (
           <button
             onClick={handleSave}
-            className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
           >
             Enregistrer
           </button>
         ) : (
           <button
             onClick={() => setEditMode(true)}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
           >
             Modifier
           </button>
