@@ -11,7 +11,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
-  const [sortBy, setSortBy] = useState("priorite");
+  const [sortBy, setSortBy] = useState("date_desc");
   const [filters, setFilters] = useState({
     client: "all",
     priorite: "all",
